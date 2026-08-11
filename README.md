@@ -1,50 +1,69 @@
 # VDatum Batch Transform
 
-Batch-transform **tidal datums** to a **geodetic datum** for a list of NOAA
-CO-OPS tide stations, using two public NOAA API web services:
+Batch-transform a **tidal datum** to a **geodetic datum** (NAVD88) for a list of
+NOAA CO-OPS tide stations, using two public NOAA API web services:
 
 - **CO-OPS Tides & Currents (T&C)** — station-published datums via the
   [Metadata API](https://api.tidesandcurrents.noaa.gov/mdapi/prod/).
 - **NOAA VDatum** — the
   [vertical datum transformation API](https://vdatum.noaa.gov/docs/services.html),
-  used as a fallback when a station has a tidal datum but no published
-  geodetic datum.
+  used to model the geodetic value when CO-OPS doesn't publish it.
 
-The tool is driven entirely by an INI config file and writes CSV output.
-The input spreadsheet is treated as **read-only** and is never modified.
+You pick one tidal datum (`MLLW`, `MLW`, `MHW`, `MHHW`, or `LMSL`) as the zero
+plane; the tool reports NAVD88 relative to it. The tool is driven entirely by an
+INI config file and writes CSV output. The input table is treated as
+**read-only** and is never modified.
 
 ---
 
 ## Pipeline
 
-For each station (identified by its 7-digit CO-OPS Station ID and lat/lon):
+One tidal datum in (the **zero plane**), one geodetic datum out (**NAVD88**),
+per station (identified by its CO-OPS Station ID and lat/lon):
 
-1. **Pull published datums** from the CO-OPS Metadata API.
-2. **Tidal (zero-plane) datum** — e.g. `MLLW`, relative to Station Datum (STND):
-   - If **absent** → value is `NULL`, and processing of that station **halts**
-     (there is no tidal reference to convert). Status `NO_TIDAL`.
-3. **Geodetic datum** — e.g. `NAVD88`, expressed relative to the tidal
-   zero-plane (`geodetic(STND) - tidal(STND)`):
-   - If **present in T&C** → store it. Source `COOPS`, status `OK`.
-   - If **absent** → fall back to **VDatum**: transform
-     `(tidal_datum, z = 0)` at the station lat/lon to the geodetic datum.
-     - Success → store the value. Source `VDATUM`, status `VDATUM_FALLBACK`.
-     - Outside VDatum's transformation domain (`-999999` / region error) →
-       value is `NULL`, processing continues. Status `VDATUM_FAIL`.
+**1. Tidal datum (the zero plane).** INI-selectable: `MLLW`, `MLW`, `MHW`,
+`MHHW`, or `LMSL`. Observed values come **only** from CO-OPS.
+   - Present in CO-OPS → `ST_<TIDAL>` = observed value, `<TIDAL>_Source = COOPS`.
+   - Absent → `ST_<TIDAL> = 0`, `<TIDAL>_Source = VDATUM_ZERO`, with a note: the
+     tidal datum is being used as the 0 reference plane for the VDatum transform
+     (it is *not* an observed value — observed tidal values are CO-OPS-only).
+
+**2. Geodetic datum (NAVD88), relative to the tidal zero plane.**
+   - CO-OPS publishes it → `ST_NAVD88 = NAVD88 − tidal` (both from CO-OPS),
+     `NAVD88_Source = COOPS`.
+   - Otherwise → **VDatum**: transform `(tidal_datum, s_z = 0) → NAVD88` at the
+     station's lat/lon. `NAVD88_Source = VDATUM`; `VDatum_uncertainty` is
+     VDatum's reported uncertainty for that transform.
+     - Out of VDatum domain / persistent server fault → the station goes to the
+       **exceptions** file (no NAVD88 obtainable).
+
+A station lands in **exceptions** only when CO-OPS has no NAVD88 **and** VDatum
+cannot transform the point. Note a station can have no observed tidal value
+(`VDATUM_ZERO`) yet still obtain a valid modeled NAVD88 — it stays in results.
 
 ### The VDatum sign convention (important)
 
-VDatum uses an **"up-is-negative"** convention: it returns the geodetic height
-of the *tidal = 0* surface. T&C (and most users) expect the geodetic value
-**relative to** the tidal datum with **up-is-positive**. This tool records
-**both**:
+VDatum uses an **"up-is-negative"** convention: for a `(tidal = 0) → NAVD88`
+transform it returns the NAVD88 height of the tidal-0 surface with up negative.
+CO-OPS (and most users) express the geodetic value **relative to** the tidal
+datum with **up-is-positive**. This tool therefore **sign-flips** VDatum's
+value (`ST_NAVD88 = −t_z`) so VDatum- and CO-OPS-sourced values share one
+convention in the same column.
 
-| Column                 | Meaning                                                        |
-|------------------------|----------------------------------------------------------------|
-| `VDatum_raw`           | Raw VDatum `t_z` (up-is-negative, VDatum native convention)    |
-| `ST_<GEODETIC>_VDatum` | Sign-flipped to T&C convention (up-is-positive, `= -t_z`)      |
+Because the tidal datum *is* the 0 plane fed to VDatum, the input carries no
+elevation uncertainty — all uncertainty is on the NAVD88 (output) side, which
+is exactly the single `VDatum_uncertainty` VDatum reports.
 
-See the last FAQ at <https://vdatum.noaa.gov/docs/faqs.html> for background.
+See the last FAQ at <https://vdatum.noaa.gov/docs/faqs.html> for background on
+the up-is-negative convention.
+
+### Internal QC cross-check (advisory)
+
+When **both** the tidal datum and NAVD88 come from CO-OPS, the tool can also
+query VDatum for the modeled NAVD88 and compare (enabled by default,
+`[qc] crosscheck_coops`). The CO-OPS observed value is **always retained**; the
+check only adds a note, flagging when the VDatum modeled value differs by more
+than VDatum's reported uncertainty (a likely VDatum grid anomaly at that point).
 
 ---
 
@@ -89,54 +108,31 @@ missing column and the `config.ini` key that controls it.
 
 ## Output columns
 
-`output/<basename>.csv` (all stations) and
-`output/<basename>_exceptions.csv` (only rows needing review):
+Two CSVs are written:
 
-- pass-through columns (e.g. `Region`, `Station Name`)
-- `Station ID`, `Latitude`, `Longitude`
-- `ST_<TIDAL> (u)` — tidal datum relative to STND
+- `output/<basename>.csv` — **results**: stations that obtained NAVD88 (from
+  CO-OPS or VDatum).
+- `output/<basename>_exceptions.csv` — stations with **no** NAVD88 (CO-OPS
+  didn't publish it *and* VDatum couldn't transform the point).
 
-Then, **for each geodetic target** in `geodetic_datums`, a column block:
+Both share the same columns:
 
-- `ST_<TARGET> (u)` — geodetic relative to tidal, from **T&C**
-- `ST_<TARGET>_VDatum (u)` — geodetic relative to tidal, from **VDatum** (T&C sign)
-- `<TARGET>_VDatum_raw (u)` — raw VDatum value (up-is-negative)
-- `<TARGET>_VDatum_uncertainty (u)`, `<TARGET>_VDatum_region`
-- `<TARGET>_Geodetic_source` — `COOPS` | `VDATUM`
-- `<TARGET>_Status` — per-target status (see below)
-- `<TARGET>_Note` — per-target detail
+| Column | Meaning |
+|---|---|
+| *(pass-through)* | e.g. `Region`, `Station Name` |
+| `Station ID`, `Latitude`, `Longitude` | station identity |
+| `ST_<TIDAL> (u)` | tidal datum value (the zero plane); `0` when `VDATUM_ZERO` |
+| `<TIDAL>_Source` | `COOPS` (observed) or `VDATUM_ZERO` (no CO-OPS value; used as 0 plane) |
+| `ST_NAVD88 (u)` | NAVD88 relative to the tidal zero plane |
+| `NAVD88_Source` | `COOPS` or `VDATUM` |
+| `VDatum_uncertainty (u)` | VDatum's reported uncertainty (blank when NAVD88 came from CO-OPS) |
+| `Notes` | provenance / QC / exception detail |
 
-Finally two station-level columns:
+`<TIDAL>` is whichever datum the INI selects (e.g. `ST_MLLW`, `MLLW_Source`).
+`(u)` is `m` or `ft` per the configured units.
 
-- `Station_status` — `PROCESSED` | `NO_TIDAL` | `COOPS_ERROR`
-- `Station_note`
-
-Per-target `Status` values:
-  - `OK` — geodetic value came straight from CO-OPS T&C.
-  - `VDATUM_FALLBACK` — geodetic value filled via VDatum.
-  - `VDATUM_OUT_OF_DOMAIN` — point is outside VDatum's tidal grid for every
-    *applicable* region (honest `-999999`, or a definitive geographic rejection
-    such as "Input Region is not correct!"); value `NULL`, continued.
-  - `VDATUM_API_ERROR` — VDatum returned a *persistent* server fault (the
-    "Uncaught error, please contact NOAA VDatum Program Support team." message,
-    retried with backoff) or an HTTP/transport error; value `NULL`, continued.
-    These are captured in a separate bug-report file (below).
-
-Station-level `NO_TIDAL` means the station has no published tidal datum, so no
-targets are attempted; `COOPS_ERROR` means the CO-OPS datums request failed.
-
-The per-target `Note` lists each region/frame attempt: `region N/A (...)` for a
-region that doesn't cover the point, vs `SERVER fault (...)` for a genuine
-VDatum server error.
-
-(`u` = `m` or `ft` per the configured units.)
-
-### Multiple geodetic targets
-
-Set `geodetic_datums` in `[datums]` to a comma-separated list (e.g.
-`NAVD88` or `NAVD88, MHW`). One tidal zero-plane (`tidal_datum`) is shared; each
-target gets its own column block and its own T&C-then-VDatum resolution.
-(NAPGD2022 is not yet on the VDatum API — a separate extractor handles it.)
+A persistent-VDatum-fault report (`output/<basename>_vdatum_bug_report.csv`)
+and a full run log (`output/<basename>.log`) are also written (see below).
 
 ### Smart region fallthrough
 
@@ -152,8 +148,8 @@ distinguishes two kinds of per-region failure:
   exponential backoff (`[api] vdatum_server_retries`) since it's sometimes
   transient; if it persists it's recorded as a real VDatum bug.
 
-Only persistent server/transport faults mark a target `VDATUM_API_ERROR` and
-count toward the "VDatum likely down" verdict.
+Only persistent server/transport faults mark a station `NO_GEODETIC` (into
+exceptions) and count toward the "VDatum likely down" verdict.
 
 ### VDatum bug report
 
@@ -219,8 +215,9 @@ python vdatum_batch_transform.py --config config.ini
 # Test on the first N stations:
 python vdatum_batch_transform.py --config config.ini --limit 5
 
-# Re-run ONLY the targets that previously failed with VDATUM_API_ERROR
-# (e.g. after VDatum recovers), merging successes into the same output:
+# Re-run ONLY the stations that ended up in exceptions with a VDatum
+# server/API error (e.g. after VDatum recovers), merging successes into
+# the same output:
 python vdatum_batch_transform.py --config config.ini --recheck-failures
 ```
 
@@ -233,18 +230,18 @@ Key options (see the file for the full annotated set):
 
 - `[input]` — source `.csv`/`.ods`/`.xlsx` file, sheet (for spreadsheets), and
   the required/optional column names (see **Input format** above).
-- `[datums]` — `tidal_datum` (single zero-plane) and `geodetic_datums`
-  (comma-separated target list), as CO-OPS abbreviations. (The legacy
-  singular `geodetic_datum` key is still accepted.)
+- `[datums]` — `tidal_datum` (the single zero-plane: `MLLW`, `MLW`, `MHW`,
+  `MHHW`, or `LMSL`) and `geodetic_datum` (the transform target, e.g. `NAVD88`).
 - `[vdatum]` — `s_h_frame` (input horizontal reference frame),
-  `epoch_in`/`epoch_out`, `s_v_frame`, `geoid`, and region handling. The VDatum
-  target vertical frame is taken per target from `geodetic_datums`.
-  `region = auto` tries each region in `region_try_order` until one succeeds.
-  Some regional tidal grids require a specific input frame — use the
-  `region:FRAME` syntax (e.g. `chesapeak_delaware:IGS14`).
+  `epoch_in`/`epoch_out`, `geoid`, and region handling. The VDatum source
+  vertical frame is the configured `tidal_datum`; the target is the
+  `geodetic_datum`. `region = auto` tries each region in `region_try_order`
+  until one succeeds. Some regional tidal grids require a specific input frame
+  — use the `region:FRAME` syntax (e.g. `chesapeak_delaware:IGS14`).
 - `[api]` — `application` identifier for CO-OPS logs, throttle sleep, timeout,
   retries, and `vdatum_server_retries` (backoff retries for the transient
   "Uncaught error" fault).
+- `[qc]` — `crosscheck_coops` (advisory internal QC; see Pipeline).
 - `[health]` — canary health-check point, on/off toggle (`canary_enabled`), and
   the `down_error_rate` threshold for the "VDatum likely down" verdict.
 
@@ -255,12 +252,14 @@ Key options (see the file for the full annotated set):
 - CO-OPS **throttles** heavy API use; a courtesy sleep is applied between
   calls (`[api] sleep_between_calls`).
 - VDatum tidal transforms only extend a short distance inland of the MHW
-  shoreline; far-inland stations return `-999999` (`VDATUM_OUT_OF_DOMAIN`).
+  shoreline; far-inland stations return `-999999` and land in exceptions.
 - **VDatum is intermittently unreliable** (500s / timeouts / "Uncaught error").
   The canary check (see above) distinguishes an outage from bad-point failures;
-  if VDatum looks down, re-run later — the CO-OPS-sourced rows are unaffected.
-- Datum values from CO-OPS are relative to **Station Datum (STND)**; this tool
-  re-references the geodetic datum to the tidal zero-plane for you.
+  if VDatum looks down, re-run later (or `--recheck-failures`) — the
+  CO-OPS-sourced rows are unaffected.
+- Observed tidal datum values come from CO-OPS only. When CO-OPS lacks the
+  tidal datum, it is used as the 0 reference plane for the VDatum transform
+  (`ST_<TIDAL> = 0`, source `VDATUM_ZERO`) — that is not an observed value.
 
 ### Exit codes
 

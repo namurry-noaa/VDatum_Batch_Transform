@@ -7,6 +7,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-08-12
+
+Major redesign of the pipeline and output schema. **Breaking** changes to the
+config keys and CSV columns.
+
+### Added
+- VDatum now models the geodetic value (NAVD88) whenever CO-OPS lacks it, using
+  the tidal datum as the 0 reference plane (`s_z = 0` → NAVD88). This fills the
+  many stations that previously had no result (the old `NO_TIDAL` category).
+- Tidal datum is now selectable in `[datums] tidal_datum`: `MLLW`, `MLW`, `MHW`,
+  `MHHW`, or `LMSL` (LMSL maps to CO-OPS `MSL` automatically).
+- When CO-OPS has no tidal value, `ST_<TIDAL>` is written as `0` with source
+  `VDATUM_ZERO` and an explanatory note (the tidal datum is the 0 plane, not an
+  observed value). Observed tidal values remain CO-OPS-only.
+- Internal QC cross-check (`[qc] crosscheck_coops`, default on): when both the
+  tidal datum and NAVD88 come from CO-OPS, VDatum's modeled value is compared;
+  a note flags disagreement beyond VDatum's reported uncertainty. Advisory only
+  — CO-OPS values are always retained and the check never affects the "VDatum
+  down" verdict.
+
+### Changed
+- **Output schema** simplified to: `ST_<TIDAL>`, `<TIDAL>_Source`, `ST_NAVD88`,
+  `NAVD88_Source`, `VDatum_uncertainty`, `Notes` (plus pass-through + id/lat/lon).
+  The per-target column blocks and the separate raw/region columns were removed.
+- **Two output CSVs** now split by outcome: `<basename>.csv` holds stations that
+  obtained NAVD88 (CO-OPS or VDatum); `<basename>_exceptions.csv` holds stations
+  with no CO-OPS NAVD88 **and** out of VDatum range.
+- VDatum values are sign-flipped to the CO-OPS up-is-positive convention in
+  `ST_NAVD88` (documented, with a link to the VDatum FAQ).
+- `--recheck-failures` now re-runs stations that landed in exceptions due to a
+  VDatum server/API error, merging successes back into the split output.
+
+### Removed
+- Multiple-geodetic-target support (`geodetic_datums` list) and the associated
+  per-target columns. The tool now does one tidal datum → one geodetic datum.
+
 ## [1.0.3] - 2026-08-12
 
 ### Changed
@@ -57,7 +93,8 @@ output.
 - Full per-run logging of every API request and response.
 - Example dataset (`examples/`) and documentation (`README.md`).
 
-[Unreleased]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v1.0.3...HEAD
+[Unreleased]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v2.0.0...HEAD
+[2.0.0]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v1.0.3...v2.0.0
 [1.0.3]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v1.0.1...v1.0.3
 [1.0.1]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/namurry-noaa/VDatum_Batch_Transform/releases/tag/v1.0.0

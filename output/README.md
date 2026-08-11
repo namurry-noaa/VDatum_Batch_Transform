@@ -5,8 +5,8 @@ base name in `[output] basename`). For a run with basename `NAME`:
 
 | File | Contents |
 |---|---|
-| `NAME.csv` | All stations with computed columns |
-| `NAME_exceptions.csv` | Only rows needing review (non-`OK`) |
+| `NAME.csv` | Stations that obtained NAVD88 (from CO-OPS or VDatum) |
+| `NAME_exceptions.csv` | Stations with no NAVD88 (no CO-OPS value **and** out of VDatum range) |
 | `NAME_vdatum_bug_report.csv` | Persistent VDatum server faults + exact failing URLs (only if any occurred) |
 | `NAME.log` | Full per-run request/response log |
 

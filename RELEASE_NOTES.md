@@ -5,6 +5,50 @@ terse, structured change list.
 
 ---
 
+## v2.0.0 — 2026-08-12
+
+Major redesign of the transform pipeline and output. **Breaking** changes to the
+config keys and CSV columns — review your `config.ini` after upgrading.
+
+### What's new
+
+- **VDatum now fills the geodetic value whenever CO-OPS lacks it.** Using the
+  tidal datum as the 0 reference plane, VDatum models NAVD88 for stations that
+  previously had no result. In practice this dramatically increases the number
+  of stations that get a usable NAVD88.
+- **Selectable tidal datum** (`[datums] tidal_datum`): `MLLW`, `MLW`, `MHW`,
+  `MHHW`, or `LMSL`. Observed tidal values still come from CO-OPS only.
+- **Clear provenance.** New `<TIDAL>_Source` and `NAVD88_Source` columns record
+  whether each value came from `COOPS` or `VDATUM`. When CO-OPS has no tidal
+  value, `ST_<TIDAL>` is `0` with source `VDATUM_ZERO` (the tidal datum is the
+  0 plane for the transform — not an observed value), explained in `Notes`.
+- **Internal QC cross-check** (on by default): when both values come from
+  CO-OPS, VDatum's modeled value is compared and a note flags any disagreement
+  beyond VDatum's reported uncertainty. CO-OPS observations are always retained.
+
+### Changed
+
+- **Simpler output schema:** `ST_<TIDAL>`, `<TIDAL>_Source`, `ST_NAVD88`,
+  `NAVD88_Source`, `VDatum_uncertainty`, `Notes` (plus your pass-through columns
+  and id/lat/lon).
+- **Two CSVs by outcome:** `<basename>.csv` (stations with NAVD88) and
+  `<basename>_exceptions.csv` (no CO-OPS NAVD88 **and** out of VDatum range).
+- VDatum values are reported in the CO-OPS up-is-positive convention
+  (sign-flipped from VDatum's native up-is-negative; see the VDatum FAQ).
+
+### Removed
+
+- Multiple simultaneous geodetic targets. The tool now does one tidal datum →
+  one geodetic datum (NAVD88).
+
+### Note on VDatum reliability
+
+VDatum's service is intermittently cranky ("Uncaught error" faults). Stations
+affected land in the exceptions file; re-run with `--recheck-failures` when the
+service recovers to fill them without redoing the whole batch.
+
+---
+
 ## v1.0.3 — 2026-08-12
 
 Documentation patch. No functional changes.
