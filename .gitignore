@@ -1,0 +1,26 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.egg-info/
+.ipynb_checkpoints/
+
+# Environments
+.venv/
+env/
+venv/
+
+# Generated outputs (do not commit result CSVs)
+output/
+output_*/
+
+# Real working data (the PJH use-case sheets) stays LOCAL — not committed.
+# Small curated example inputs live in examples/ and ARE committed.
+data/
+
+# OS / editor cruft
+.DS_Store
+*~
+.vscode/
+
+# Per-project session log (kept local per 3431 convention)
+*_summary.claude

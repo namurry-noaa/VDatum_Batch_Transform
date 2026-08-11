@@ -1,0 +1,61 @@
+# ============================================================================
+# Canonical .gitattributes — line-ending policy for all NOAA Coding repos
+# ----------------------------------------------------------------------------
+# Store text as LF in the repository; check out native per-OS.
+# Prevents phantom "whole file changed" diffs when moving repos between
+# Linux (LF) and the NOAA Windows machine (CRLF).
+# Master copy lives in Dev_Config_Backup/shared/git/.gitattributes
+# ============================================================================
+
+# Default: auto-detect text, normalize to LF in the repo.
+* text=auto
+
+# --- Explicitly LF (scripts / configs that must stay Unix) -----------------
+*.py     text eol=lf
+*.sh     text eol=lf
+*.bash   text eol=lf
+*.cfg    text eol=lf
+*.ini    text eol=lf
+*.toml   text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
+*.json   text eol=lf
+*.md     text eol=lf
+*.txt    text eol=lf
+*.csv    text eol=lf
+*.sql    text eol=lf
+*.js     text eol=lf
+*.ts     text eol=lf
+*.html   text eol=lf
+*.css    text eol=lf
+*.pyx    text eol=lf
+*.pxd    text eol=lf
+.gitattributes text eol=lf
+.gitignore     text eol=lf
+
+# --- Explicitly CRLF (Windows-only tooling that requires it) ---------------
+*.ps1    text eol=crlf
+*.bat    text eol=crlf
+*.cmd    text eol=crlf
+
+# --- Binary (never touch / never diff as text) -----------------------------
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.pdf    binary
+*.zip    binary
+*.gz     binary
+*.7z     binary
+*.pyd    binary
+*.so     binary
+*.dll    binary
+*.exe    binary
+*.xlsx   binary
+*.xls    binary
+*.gpkg   binary
+*.shp    binary
+*.dbf    binary
+*.tif    binary
+*.tiff   binary

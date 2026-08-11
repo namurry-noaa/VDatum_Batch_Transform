@@ -1,0 +1,9 @@
+name: vdatum_batch_xform
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - pandas
+  - requests
+  - odfpy        # reading .ods spreadsheets (input); output is CSV
