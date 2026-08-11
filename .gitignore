@@ -9,13 +9,17 @@ __pycache__/
 env/
 venv/
 
-# Generated outputs (do not commit result CSVs)
-output/
+# Generated outputs (do not commit result files) — but SHIP the empty dir
+# with its README so users don't have to create it.
+output/*
+!output/README.md
 output_*/
 
 # Real working data (the PJH use-case sheets) stays LOCAL — not committed.
 # Small curated example inputs live in examples/ and ARE committed.
-data/
+# SHIP the empty data/ dir with its README (contents otherwise ignored).
+data/*
+!data/README.md
 
 # OS / editor cruft
 .DS_Store

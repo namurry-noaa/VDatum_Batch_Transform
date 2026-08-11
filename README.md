@@ -1,7 +1,7 @@
 # VDatum Batch Transform
 
 Batch-transform **tidal datums** to a **geodetic datum** for a list of NOAA
-CO-OPS tide stations, using two public NOAA web services:
+CO-OPS tide stations, using two public NOAA API web services:
 
 - **CO-OPS Tides & Currents (T&C)** — station-published datums via the
   [Metadata API](https://api.tidesandcurrents.noaa.gov/mdapi/prod/).
