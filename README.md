@@ -54,6 +54,11 @@ The source table can be **`.csv`, `.ods`, or `.xlsx`** (auto-detected by file
 extension; the sheet/tab name applies to `.ods`/`.xlsx` only). It is read-only —
 the tool never modifies it.
 
+**One file per run.** The tool processes only the single file named in
+`config.ini` `[input] file`; it does not scan the input directory. To process
+several sheets, run the tool once per file, each with its own `[output]
+basename` so results don't overwrite each other.
+
 **Required columns** (a header row is required). The default header names are:
 
 | Purpose | Default header | config.ini key |
