@@ -7,7 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [2.0.0] - 2026-08-12
+## [2.0.1] - 8/12/2026
+
+### Changed
+- Switched release dates in `CHANGELOG.md` and `RELEASE_NOTES.md` from
+  year-first `YYYY-MM-DD` to `M/D/YYYY` (e.g. `8/12/2026`). Documentation only;
+  no code or behavior change.
+
+## [2.0.0] - 8/12/2026
 
 Major redesign of the pipeline and output schema. **Breaking** changes to the
 config keys and CSV columns.
@@ -43,7 +50,7 @@ config keys and CSV columns.
 - Multiple-geodetic-target support (`geodetic_datums` list) and the associated
   per-target columns. The tool now does one tidal datum → one geodetic datum.
 
-## [1.0.3] - 2026-08-12
+## [1.0.3] - 8/12/2026
 
 ### Changed
 - Documented the "one file per run" input contract in `README.md` (Input
@@ -53,7 +60,7 @@ config keys and CSV columns.
 
   (Supersedes an incomplete v1.0.2 tag that omitted the README change.)
 
-## [1.0.1] - 2026-08-12
+## [1.0.1] - 8/12/2026
 
 ### Added
 - Shipped empty `data/` and `output/` directories, each with a `README.md`, so
@@ -66,7 +73,7 @@ config keys and CSV columns.
 ### Changed
 - Documentation/metadata edits to `README.md` and `config.ini`.
 
-## [1.0.0] - 2026-08-12
+## [1.0.0] - 8/12/2026
 
 First public release. Batch-transforms tidal datums to geodetic datums for a
 list of NOAA CO-OPS tide stations, using the CO-OPS Tides & Currents Metadata
@@ -93,7 +100,8 @@ output.
 - Full per-run logging of every API request and response.
 - Example dataset (`examples/`) and documentation (`README.md`).
 
-[Unreleased]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v2.0.0...HEAD
+[Unreleased]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v2.0.1...HEAD
+[2.0.1]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v1.0.3...v2.0.0
 [1.0.3]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v1.0.1...v1.0.3
 [1.0.1]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v1.0.0...v1.0.1

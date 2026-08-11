@@ -5,7 +5,17 @@ terse, structured change list.
 
 ---
 
-## v2.0.0 — 2026-08-12
+## v2.0.1 — 8/12/2026
+
+Documentation patch. No functional changes.
+
+### Changed
+- Release dates now use `M/D/YYYY` (e.g. `8/12/2026`) instead of the year-first
+  `YYYY-MM-DD` format, in both this file and `CHANGELOG.md`.
+
+---
+
+## v2.0.0 — 8/12/2026
 
 Major redesign of the transform pipeline and output. **Breaking** changes to the
 config keys and CSV columns — review your `config.ini` after upgrading.
@@ -49,7 +59,7 @@ service recovers to fill them without redoing the whole batch.
 
 ---
 
-## v1.0.3 — 2026-08-12
+## v1.0.3 — 8/12/2026
 
 Documentation patch. No functional changes.
 
@@ -64,7 +74,7 @@ Documentation patch. No functional changes.
 
 ---
 
-## v1.0.1 — 2026-08-12
+## v1.0.1 — 8/12/2026
 
 Maintenance / packaging patch. No functional changes to the transform logic.
 
@@ -79,7 +89,7 @@ Maintenance / packaging patch. No functional changes to the transform logic.
 
 ---
 
-## v1.0.0 — 2026-08-12
+## v1.0.0 — 8/12/2026
 
 First public release. Batch-transforms tidal datums to geodetic datums for a list of NOAA CO-OPS tide stations, using the CO-OPS Tides & Currents Metadata API with a NOAA VDatum API fallback.
 
