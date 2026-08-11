@@ -5,16 +5,18 @@ terse, structured change list.
 
 ---
 
-## v1.0.2 — 2026-08-12
+## v1.0.3 — 2026-08-12
 
 Documentation patch. No functional changes.
 
 ### Changed
-- Made the **one file per run** input contract explicit in `data/README.md` and
-  the `config.ini [input]` section: the tool processes only the single file
-  named in `[input] file` (it does not scan a directory). To process several
-  sheets, run the tool once per file, each with its own `[output] basename` so
-  results don't overwrite each other.
+- Made the **one file per run** input contract explicit in `README.md` (Input
+  format), `data/README.md`, and the `config.ini [input]` section: the tool
+  processes only the single file named in `[input] file` (it does not scan a
+  directory). To process several sheets, run the tool once per file, each with
+  its own `[output] basename` so results don't overwrite each other.
+
+  (Supersedes v1.0.2, whose commit landed before the README edit was included.)
 
 ---
 
