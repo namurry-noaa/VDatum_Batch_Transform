@@ -5,6 +5,11 @@ Put your source table here (or anywhere — the path is set in `config.ini`
 
 Accepted formats: **`.csv`, `.ods`, `.xlsx`**.
 
+**One file per run.** The tool processes exactly the single file named in
+`config.ini [input] file`; it does not scan this directory. To process several
+sheets, run the tool once per file — give each run its own `[output] basename`
+so the results don't overwrite each other.
+
 Required columns (a header row is required; names configurable in
 `config.ini [input]`):
 

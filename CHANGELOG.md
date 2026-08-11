@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-08-12
+
+### Changed
+- Documented the "one file per run" input contract in `data/README.md` and the
+  `config.ini [input]` section (the tool processes only the file named in
+  `[input] file`; run once per file with a distinct `[output] basename` to
+  process several sheets). No behavior change.
+
 ## [1.0.1] - 2026-08-12
 
 ### Added
@@ -47,6 +55,7 @@ output.
 - Full per-run logging of every API request and response.
 - Example dataset (`examples/`) and documentation (`README.md`).
 
-[Unreleased]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v1.0.2...HEAD
+[1.0.2]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v1.0.1...v1.0.2
 [1.0.1]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v1.0.0...v1.0.1
 [1.0.0]: https://github.com/namurry-noaa/VDatum_Batch_Transform/releases/tag/v1.0.0
