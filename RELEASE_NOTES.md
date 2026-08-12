@@ -5,6 +5,16 @@ terse, structured change list.
 
 ---
 
+## v2.0.2 — 8/12/2026
+
+Documentation patch. No functional changes.
+
+### Changed
+- README copyedit: typo and wording fixes throughout (pipeline, sign
+  convention, and QC sections).
+
+---
+
 ## v2.0.1 — 8/12/2026
 
 Documentation patch. No functional changes.

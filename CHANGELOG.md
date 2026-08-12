@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.2] - 8/12/2026
+
+### Changed
+- README copyedit: typo and wording fixes throughout (pipeline, sign
+  convention, and QC sections). Documentation only; no code or behavior change.
+
 ## [2.0.1] - 8/12/2026
 
 ### Changed
@@ -100,7 +106,8 @@ output.
 - Full per-run logging of every API request and response.
 - Example dataset (`examples/`) and documentation (`README.md`).
 
-[Unreleased]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v2.0.1...HEAD
+[Unreleased]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v2.0.2...HEAD
+[2.0.2]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v2.0.1...v2.0.2
 [2.0.1]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v2.0.0...v2.0.1
 [2.0.0]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v1.0.3...v2.0.0
 [1.0.3]: https://github.com/namurry-noaa/VDatum_Batch_Transform/compare/v1.0.1...v1.0.3
