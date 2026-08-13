@@ -5,7 +5,19 @@ terse, structured change list.
 
 ---
 
-## v2.0.2 — 8/12/2026
+## v2.0.3 — 2026-08-12
+
+Documentation patch. No functional changes.
+
+### Changed
+- Reverted release dates to the ISO `YYYY-MM-DD` format (undoing the `M/D/YYYY`
+  change from 2.0.1), matching the Keep a Changelog standard.
+- Project summary is now tracked in the repo as
+  `VDatum_Batch_Transform_summary.md` (previously a local `.claude` file).
+
+---
+
+## v2.0.2 — 2026-08-12
 
 Documentation patch. No functional changes.
 
@@ -15,7 +27,7 @@ Documentation patch. No functional changes.
 
 ---
 
-## v2.0.1 — 8/12/2026
+## v2.0.1 — 2026-08-12
 
 Documentation patch. No functional changes.
 
@@ -25,7 +37,7 @@ Documentation patch. No functional changes.
 
 ---
 
-## v2.0.0 — 8/12/2026
+## v2.0.0 — 2026-08-12
 
 Major redesign of the transform pipeline and output. **Breaking** changes to the
 config keys and CSV columns — review your `config.ini` after upgrading.
@@ -69,7 +81,7 @@ service recovers to fill them without redoing the whole batch.
 
 ---
 
-## v1.0.3 — 8/12/2026
+## v1.0.3 — 2026-08-12
 
 Documentation patch. No functional changes.
 
@@ -84,7 +96,7 @@ Documentation patch. No functional changes.
 
 ---
 
-## v1.0.1 — 8/12/2026
+## v1.0.1 — 2026-08-12
 
 Maintenance / packaging patch. No functional changes to the transform logic.
 
@@ -99,7 +111,7 @@ Maintenance / packaging patch. No functional changes to the transform logic.
 
 ---
 
-## v1.0.0 — 8/12/2026
+## v1.0.0 — 2026-08-12
 
 First public release. Batch-transforms tidal datums to geodetic datums for a list of NOAA CO-OPS tide stations, using the CO-OPS Tides & Currents Metadata API with a NOAA VDatum API fallback.
 

@@ -26,5 +26,6 @@ data/*
 *~
 .vscode/
 
-# Per-project session log (kept local per 3431 convention)
+# Legacy local session log format (superseded by the tracked
+# <project>_summary.md, which IS committed).
 *_summary.claude
