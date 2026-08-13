@@ -13,8 +13,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Reverted release dates in `CHANGELOG.md` and `RELEASE_NOTES.md` back to the
   ISO `YYYY-MM-DD` format (the Keep a Changelog standard), undoing the
   `M/D/YYYY` change introduced in 2.0.1. Documentation only.
-- Project summary is now tracked as `VDatum_Batch_Transform_summary.md`
-  (previously a local, gitignored `.claude` reminder file).
 
 ## [2.0.2] - 2026-08-12
 

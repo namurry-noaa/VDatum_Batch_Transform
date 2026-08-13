@@ -12,8 +12,6 @@ Documentation patch. No functional changes.
 ### Changed
 - Reverted release dates to the ISO `YYYY-MM-DD` format (undoing the `M/D/YYYY`
   change from 2.0.1), matching the Keep a Changelog standard.
-- Project summary is now tracked in the repo as
-  `VDatum_Batch_Transform_summary.md` (previously a local `.claude` file).
 
 ---
 

@@ -26,6 +26,7 @@ data/*
 *~
 .vscode/
 
-# Legacy local session log format (superseded by the tracked
-# <project>_summary.md, which IS committed).
+# Project summary / session notes — kept LOCAL, never committed to the public
+# repo. Both the legacy .claude form and the newer .md form are ignored.
 *_summary.claude
+*_summary.md
